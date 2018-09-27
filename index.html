@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>循环无缝滚动</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    ul {
+      list-style: none;
+      width: 284px;
+      height: 177px;
+    }
+
+    .wrap {
+      width: 284px;
+      height: 177px;
+      margin: 0 auto;
+      overflow: hidden;
+      border: 1px solid #ccc;
+    }
+
+    .scroll {
+      display: flex;
+      transform: translateX(-284px);
+    }
+
+    .scroll.ani {
+      transition: 0.2s all linear;
+    }
+
+    .scroll li {
+      flex: 1 0 284px;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <ul class="scroll">
+      <li class="item">
+        <img src="./images/1.jpg" />
+      </li>
+      <li class="item">
+        <img src="./images/2.jpg" />
+      </li>
+      <li class="item">
+        <img src="./images/3.jpg" />
+      </li>
+      <li class="item">
+        <img src="./images/4.jpg" />
+      </li>
+    </ul>
+  </div>
+  <button class="prev">prev</button>
+  <button class="next">next</button>
+  <script>
+    // 封装大图无缝轮播
+    /**
+     * 先获取dom中轮播图的dom
+    */
+    var wrap = document.querySelector('.wrap');
+    var scroll = document.querySelector('.scroll');
+    var prev = document.querySelector('.prev');
+    var next = document.querySelector('.next');
+    var li_width = scroll.children[0].getBoundingClientRect().width;
+    var li_l = scroll.children.length;
+    /**
+     * 1、将第一张图复制一份，放置最后一张图后
+     * 2、将最后一张图复制一份，放置第一张图前
+    */
+    var li_clone_first = document.createElement('li');
+    var li_first = scroll.children[0];
+    li_clone_first.className = 'item';
+    li_clone_first.innerHTML = li_first.innerHTML;
+    var li_clone_last = document.createElement('li');
+    var li_last = scroll.children[li_l - 1];
+    li_clone_last.className = 'item';
+    li_clone_last.innerHTML = li_last.innerHTML;
+    scroll.insertBefore(li_clone_last, li_first);
+    scroll.appendChild(li_clone_first);
+    /**
+     * 添加上一张和下一张事件
+    */
+    prev.addEventListener('click', function (event) {
+      event.stopPropagation();
+      scroll.classList.add('ani');
+      var transform = window.getComputedStyle(scroll, null).transform;
+      var translateX = parseInt(transform.split(',')[4]);
+      var distance = translateX + li_width;
+      var min_limit = - li_width;
+      var max_limit = - li_width * li_l;
+      scroll.style.transform = 'translateX(' + distance + 'px)';
+      if (distance > min_limit) {
+        setTimeout(function () {
+          scroll.classList.remove('ani');
+          scroll.style.transform = 'translateX(' + max_limit + 'px)';
+        }, 300)
+      }
+    });
+    next.addEventListener('click', function (event) {
+      event.stopPropagation();
+      scroll.classList.add('ani');
+      var transform = window.getComputedStyle(scroll, null).transform;
+      var translateX = parseInt(transform.split(',')[4]);
+      var distance = translateX - li_width;
+      var min_limit = - li_width;
+      var max_limit = - li_width * li_l;
+      scroll.style.transform = 'translateX(' + distance + 'px)';
+      if (distance < max_limit) {
+        setTimeout(function () {
+          scroll.classList.remove('ani');
+          scroll.style.transform = 'translateX(' + min_limit + 'px)';
+        }, 300)
+      }
+    });
+  </script>
+</body>
+
+</html>
